@@ -1,0 +1,40 @@
+{
+  "name": "scrainshots-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-powered screenshot analysis and management system",
+  "scripts": {
+    "setup": "pnpm install && pnpm setup:python",
+    "setup:python": "curl -LsSf https://astral.sh/uv/install.sh | sh && uv sync",
+    "setup:python:local": "uv sync --extra local",
+    "dev": "concurrently \"pnpm:dev:python\" \"pnpm:dev:next\"",
+    "dev:python": "uv run python api_flask_server.py",
+    "dev:next": "cd screenshot-viewer && pnpm dev",
+    "build": "pnpm build:python && pnpm build:next",
+    "build:python": "uv sync --frozen",
+    "build:next": "cd screenshot-viewer && pnpm build",
+    "start": "concurrently \"pnpm:start:python\" \"pnpm:start:next\"",
+    "start:python": "uv run python api_flask_server.py",
+    "start:next": "cd screenshot-viewer && pnpm start",
+    "electron": "cd screenshot-viewer && pnpm electron",
+    "electron:dev": "concurrently \"pnpm:dev:python\" \"pnpm:electron:dev:app\"",
+    "electron:dev:app": "cd screenshot-viewer && pnpm electron-dev",
+    "dist": "pnpm build && cd screenshot-viewer && pnpm dist",
+    "process": "uv run python -m batch_processor",
+    "test": "pnpm test:python && pnpm test:next",
+    "test:python": "uv run pytest",
+    "test:next": "cd screenshot-viewer && pnpm test",
+    "lint": "pnpm lint:python && pnpm lint:next",
+    "lint:python": "uv run ruff check . && uv run black --check .",
+    "lint:fix": "uv run ruff check --fix . && uv run black .",
+    "clean": "rm -rf .venv screenshot_db processed_screenshots && cd screenshot-viewer && rm -rf .next node_modules"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.1"
+}
