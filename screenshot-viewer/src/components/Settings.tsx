@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
-import { Settings as SettingsIcon, Download, CheckCircle, AlertCircle } from 'lucide-react'
+import { Settings as SettingsIcon, Download, CheckCircle, AlertCircle, Brain, Key } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -11,6 +11,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import axios from 'axios'
+import IntegrationsConfig from './IntegrationsConfig'
 
 interface LLMModel {
   hf_repo: string
@@ -25,6 +26,7 @@ interface SettingsProps {
 }
 
 export function Settings({ open, onOpenChange }: SettingsProps) {
+  const [activeTab, setActiveTab] = useState<'llm' | 'integrations'>('llm')
   const [runtime, setRuntime] = useState<'lmstudio' | 'local'>('lmstudio')
   const [supportedModels, setSupportedModels] = useState<Record<string, LLMModel>>({})
   const [downloadedModels, setDownloadedModels] = useState<string[]>([])
@@ -112,15 +114,48 @@ export function Settings({ open, onOpenChange }: SettingsProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader>
-          <DialogTitle>LLM Settings</DialogTitle>
+          <DialogTitle>Settings</DialogTitle>
           <DialogDescription>
-            Configure how screenshots are processed with AI
+            Configure AI processing and integrations
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 mt-4">
+        {/* Tabs */}
+        <div className="flex border-b">
+          <button
+            onClick={() => setActiveTab('llm')}
+            className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
+              activeTab === 'llm'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Brain className="h-4 w-4" />
+              LLM Settings
+            </div>
+          </button>
+          <button
+            onClick={() => setActiveTab('integrations')}
+            className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
+              activeTab === 'integrations'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Key className="h-4 w-4" />
+              Integrations
+            </div>
+          </button>
+        </div>
+
+        {/* Tab Content */}
+        <div className="flex-1 overflow-y-auto">
+          {activeTab === 'llm' ? (
+            <div className="space-y-6 p-6">
           <div>
             <h3 className="text-lg font-semibold mb-3">Runtime Selection</h3>
             <div className="space-y-3">
@@ -248,14 +283,23 @@ export function Settings({ open, onOpenChange }: SettingsProps) {
             </div>
           )}
 
-          <div className="flex justify-end space-x-3 pt-4 border-t">
-            <Button onClick={() => onOpenChange(false)} variant="outline">
-              Cancel
-            </Button>
-            <Button onClick={saveSettings}>
-              Save Settings
-            </Button>
-          </div>
+              <div className="flex justify-end space-x-3 pt-4 border-t">
+                <Button onClick={() => onOpenChange(false)} variant="outline">
+                  Cancel
+                </Button>
+                <Button onClick={saveSettings}>
+                  Save Settings
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="p-6">
+              <IntegrationsConfig onConfigUpdate={() => {
+                // Optionally refresh or notify about config changes
+                console.log('Integration config updated')
+              }} />
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
